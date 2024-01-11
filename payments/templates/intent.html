@@ -1,0 +1,70 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Intent</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link href="{% static 'css/checkout.css' %}" rel="stylesheet" />
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <section>
+        {% for item in order.items.all %}
+        <div class="product">
+            <div class="description">
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <h5>Price: {{ item.price }} {{ item.currency }}</h5>
+            </div>
+        </div>
+        {% endfor %}
+        ***
+        <p>Discount: {{ order.discount.ratio|multiply_by_100|floatformat:"0" }}%</p>
+        <p>Tax: {{ order.tax.rate|multiply_by_100|floatformat:"0" }}%</p>
+        <h2>Total Amount: {{ order.total_amount|floatformat:"2" }} {{ order.currency }}</h2>
+        <div id="card-element"></div>
+        <button id="checkout-button">Pay Now</button>
+
+        <script>
+            var stripe = Stripe('{{ stripe_public_key }}');
+            var elements = stripe.elements();
+            var cardElement = elements.create('card');
+            cardElement.mount('#card-element');
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            var checkoutButton = document.getElementById('checkout-button');
+
+            checkoutButton.addEventListener('click', function () {
+                fetch('/pay/{{ order.id }}/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({}),
+                })
+                .then(response => response.json())
+                .then(clientSecret => {
+                    return stripe.confirmCardPayment(clientSecret.clientSecret, {
+                        payment_method: {
+                            card: cardElement,
+                        },
+                    });
+                })
+                .then(result => {
+                    if (result.error) {
+                        alert(result.error.message);
+                    } else {
+                        window.location.href = '/success/';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = '/cancel/';
+                });
+            });
+        </script>
+    </section>
+</body>
+</html>
