@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Menu</title>
+    <style>
+        a {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Main Menu</h1>
+    <a href="{% url 'item_detail' item_id=1 %}">Pay item in USD</a>
+    <a href="{% url 'item_detail' item_id=3 %}">Pay item in EUR</a>
+    <a href="{% url 'order_detail' order_id=1 %}">Pay order</a>
+    <a href="{% url 'intent' order_id=1 %}">Payment intent</a>
+</body>
+</html>

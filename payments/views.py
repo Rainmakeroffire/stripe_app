@@ -114,3 +114,7 @@ def success(request):
 
 def cancel(request):
     return render(request, 'cancel.html')
+
+
+def menu(request):
+    return render(request, 'menu.html')

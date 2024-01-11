@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (create_checkout_session, create_order_checkout_session, create_payment_intent,
-                    item_detail, order_detail, intent, success, cancel)
+                    item_detail, order_detail, intent, success, cancel, menu)
 
 urlpatterns = [
     path('buy/<int:item_id>/', create_checkout_session, name='get_session_id'),
@@ -13,5 +13,6 @@ urlpatterns = [
 
     path('success/', success, name='success'),
     path('cancel/', cancel, name='cancel'),
+    path('', menu, name='menu'),
 ]
 
